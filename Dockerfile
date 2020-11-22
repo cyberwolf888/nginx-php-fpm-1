@@ -1,6 +1,6 @@
-FROM debian:buster
+FROM debian:buster-slim
 
-LABEL maintainer="Colin Wilson colin@wyveo.com"
+LABEL maintainer="Hendra Wijaya info@imadehendrawijaya.com"
 
 # Let the container know that there is no tty
 ENV DEBIAN_FRONTEND noninteractive
@@ -68,9 +68,9 @@ RUN buildDeps='curl gcc make autoconf libc-dev zlib1g-dev pkg-config' \
     && echo "#!/bin/sh\nexit 0" > /usr/sbin/policy-rc.d \
     && rm -rf /etc/nginx/conf.d/default.conf \
     && sed -i -e "s/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/g" ${php_conf} \
-    && sed -i -e "s/memory_limit\s*=\s*.*/memory_limit = 256M/g" ${php_conf} \
-    && sed -i -e "s/upload_max_filesize\s*=\s*2M/upload_max_filesize = 100M/g" ${php_conf} \
-    && sed -i -e "s/post_max_size\s*=\s*8M/post_max_size = 100M/g" ${php_conf} \
+    && sed -i -e "s/memory_limit\s*=\s*.*/memory_limit = 512M/g" ${php_conf} \
+    && sed -i -e "s/upload_max_filesize\s*=\s*2M/upload_max_filesize = 1000M/g" ${php_conf} \
+    && sed -i -e "s/post_max_size\s*=\s*8M/post_max_size = 1000M/g" ${php_conf} \
     && sed -i -e "s/variables_order = \"GPCS\"/variables_order = \"EGPCS\"/g" ${php_conf} \
     && sed -i -e "s/;daemonize\s*=\s*yes/daemonize = no/g" /etc/php/7.4/fpm/php-fpm.conf \
     && sed -i -e "s/;catch_workers_output\s*=\s*yes/catch_workers_output = yes/g" ${fpm_conf} \
@@ -108,6 +108,9 @@ ADD ./default.conf /etc/nginx/conf.d/default.conf
 
 # Override default nginx welcome page
 COPY html /usr/share/nginx/html
+
+# add additional php.ini
+ADD ./php.ini /etc/php/7.4/fpm/conf.d/php.ini
 
 # Add Scripts
 ADD ./start.sh /start.sh
